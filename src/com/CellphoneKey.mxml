@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com:CanvasButton xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:com="com.*" height="100%" width="33%" fontSize="14" textAlign="left">
+	<mx:Script>
+		<![CDATA[
+			import com.Verb;
+			import com.ImageMap;
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+       		import mx.controls.Alert;
+       		import mx.effects.easing.Bounce;
+       		import mx.core.BitmapAsset;
+       		import mx.managers.PopUpManager;
+       		import mx.events.CloseEvent;
+       		
+       		public var value:String = '';
+       		public var parentCellphone:PhoneInputWindow;
+       		
+       		[Bindable]
+       		public var cornerText:String = "";
+       		
+       		public var textSky:String = "";
+       		public var textAny:String = "";
+       		public var textCyon:String = "";
+       		public var textMotorola:String = "";
+       		
+       		public function setMode(mode:String):void
+       		{
+       			if(mode == "sky") {
+       				cornerText = textSky;
+       			} else if(mode == "any") {
+       				cornerText = textAny;
+       			} else if(mode == "cyon") {
+       				cornerText = textCyon;
+       			} else if(mode == "motorola") {
+       				cornerText = textMotorola;
+       			}
+       		}
+		]]>
+	</mx:Script>
+	<mx:Label id="cornerLabel" text="{cornerText}" width="100%" textAlign="right" fontSize="12" fontWeight="bold"/>
+</com:CanvasButton>

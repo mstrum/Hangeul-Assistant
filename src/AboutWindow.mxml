@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="horizontal" showCloseButton="true" title="About" horizontalAlign="center" verticalGap="2" borderAlpha=".9" borderColor="#A6CCF4" xmlns:ns1="com.*">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+		]]>
+	</mx:Script>
+	<ns1:ImageButton source="@Embed('../images/wiki.png')" useHandCursor="true" buttonMode="true" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Main_Page'), '_blank');"/>
+	<mx:VBox horizontalAlign="center" verticalAlign="middle">
+	<mx:Label text="Hangeul Asisstant 0.9.1" fontSize="16" fontWeight="bold"/>
+	<mx:HRule width="100%"/>
+	<mx:LinkButton label="More Information" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Hangeul_Assistant'), '_blank');"/>
+	<mx:HRule width="100%"/>
+	<mx:Label text="made by"/>
+	<mx:LinkButton label="Matt Strum" click="navigateToURL(new URLRequest('http://www.mstrum.com'), '_blank');"/>
+	</mx:VBox>
+</mx:TitleWindow>

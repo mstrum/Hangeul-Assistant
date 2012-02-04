@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResizeWindow xmlns="com.*" xmlns:mx="http://www.adobe.com/2006/mxml"
+	width="450" height="175" showCloseButton="true" title="Korean Keyboard (type or click)" layout="vertical" resizable="true"
+	verticalGap="2" paddingBottom="2" paddingLeft="2" paddingTop="2" paddingRight="2" backgroundColor="#9BCCFE"
+    creationComplete="afterInit()" close="onClose(event)"
+    borderAlpha="1" borderColor="#FEDA4A" headerColors="[#ffffff,#FEDA4A]" headerHeight="20" borderThicknessBottom="5" borderThicknessLeft="5" borderThicknessRight="5" borderThicknessTop="2">
+	<mx:Script>
+		<![CDATA[
+       		import mx.events.CloseEvent;
+       		
+       		[Bindable]
+       		public var shiftEnabled:Boolean = false;
+       		public var shiftButtonDown:Boolean = false;
+       		
+       		public var mainForm:hangeulAssistant = null;
+
+       		public var keyArray:Array = new Array();
+       		
+       		private function afterInit():void {
+       			keyArray.push(q);
+       			keyArray.push(w);
+       			keyArray.push(e);
+       			keyArray.push(r);
+       			keyArray.push(t);
+       			keyArray.push(yKey);
+       			keyArray.push(u);
+       			keyArray.push(i);
+       			keyArray.push(o);
+       			keyArray.push(p);
+       			keyArray.push(a);
+       			keyArray.push(s);
+       			keyArray.push(d);
+       			keyArray.push(f);
+       			keyArray.push(g);
+       			keyArray.push(h);
+       			keyArray.push(j);
+       			keyArray.push(k);
+       			keyArray.push(l);
+       			keyArray.push(zKey);
+       			keyArray.push(xKey);
+       			keyArray.push(c);
+       			keyArray.push(v);
+       			keyArray.push(b);
+       			keyArray.push(n);
+       			keyArray.push(m);
+       			
+       			for each(var key:KeyboardKey in keyArray) {
+       				key.parentKeyboard = this;
+       			}
+       			
+       			space.parentKeyboard = this;
+       			
+       			this.addEventListener(KeyboardEvent.KEY_DOWN,keyDown);
+       			this.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+       			this.setFocus();
+       		}
+       		
+       		private function onClose(evt:CloseEvent):void {
+       			// Stop window from closing on enter
+       			if(evt.detail == 0) {
+       				evt.stopImmediatePropagation();
+       			}
+       		}
+       		
+       		private function keyUp(evt:KeyboardEvent):void{
+       			if(evt.keyCode == Keyboard.SHIFT) {
+       				shiftButtonDown = false;
+       				if(this.shiftEnabled)
+       					toggleShift();
+       			} else {
+       				var key:KeyboardKey = null;
+	   		    	switch(evt.keyCode)
+	   		    	{
+	   		    		case 8:
+	   		    			key = del;
+	   		    			break;
+	   		    		case 108:
+	   		    		case 13:
+	   		    			key = enter;
+	   		    			break;
+	   		    		case 32:
+	   		    			key = space;
+	   		    			break;
+	   		    		case 65:
+	   		    			key = a;
+	   		    			break;
+	   		    		case 66:
+	   		    			key = b;
+	   		    			break;
+	   		    		case 67:
+	   		    			if(evt.ctrlKey)
+	   		    				key = copy;
+	   		    			else
+	   		    				key = c;
+	   		    			break;
+	   		    		case 68:
+	   		    			key = d;
+	   		    			break;
+	   		    		case 69:
+	   		    			key = e;
+	   		    			break;
+	   		    		case 70:
+	   		    			key = f;
+	   		    			break;
+	   		    		case 71:
+	   		    			key = g;
+	   		    			break;
+	   		    		case 72:
+	   		    			key = h;
+	   		    			break;
+	   		    		case 73:
+	   		    			key = i;
+	   		    			break;
+	   		    		case 74:
+	   		    			key = j;
+	   		    			break;
+	   		    		case 75:
+	   		    			key = k;
+	   		    			break;
+	   		    		case 76:
+	   		    			key = l;
+	   		    			break;
+	   		    		case 77:
+	   		    			key = m;
+	   		    			break;
+	   		    		case 78:
+	   		    			key = n;
+	   		    			break;
+	   		    		case 79:
+	   		    			key = o;
+	   		    			break;
+	   		    		case 80:
+	   		    			key = p;
+	   		    			break;
+	   		    		case 81:
+	   		    			key = q;
+	   		    			break;
+	   		    		case 82:
+	   		    			key = r;
+	   		    			break;
+	   		    		case 83:
+	   		    			key = s;
+	   		    			break;
+	   		    		case 84:
+	   		    			key = t;
+	   		    			break;
+	   		    		case 85:
+	   		    			key = u;
+	   		    			break;
+	   		    		case 86:
+	   		    			key = v;
+	   		    			break;
+	   		    		case 87:
+	   		    			key = w;
+	   		    			break;
+	   		    		case 88:
+	   		    			key = xKey;
+	   		    			break;
+	   		    		case 89:
+	   		    			key = yKey;
+	   		    			break;
+	   		    		case 90:
+	   		    			key = zKey;
+	   		    			break;
+	   		    	}
+	   		    	if(key != null)
+       					key.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
+       			}
+       		}
+       		
+   		    private function keyDown(evt:KeyboardEvent):void{
+   		    	if(evt.keyCode == Keyboard.SHIFT) {
+       				if(!shiftEnabled)
+       					toggleShift();
+       				shiftButtonDown = true;
+       			} else {
+       				var key:KeyboardKey = null;
+
+	   		    	switch(evt.keyCode)
+	   		    	{
+	   		    		case 8:
+	   		    			key = del;
+	   		    			break;
+	   		    		case 27:
+	   		    			close(1);
+	   		    			return;
+	   		    		case 108:
+	   		    		case 13:
+	   		    			key = enter;
+	   		    			break;
+	   		    		case 46:
+	   		    			mainForm.deleteBack();
+	   		    			return;
+	   		    		case 37:
+	   		    			mainForm.moveCursorLeft();
+	   		    			return;
+	   		    		case 39:
+	   		    			mainForm.moveCursorRight();
+	   		    			return;
+	   		    		case 32:
+	   		    			key = space;
+	   		    			break;
+	   		    		case 65:
+	   		    			key = a;
+	   		    			break;
+	   		    		case 66:
+	   		    			key = b;
+	   		    			break;
+	   		    		case 67:
+	   		    			if(evt.ctrlKey)
+	   		    				key = copy;
+	   		    			else
+	   		    				key = c;
+	   		    			break;
+	   		    		case 68:
+	   		    			key = d;
+	   		    			break;
+	   		    		case 69:
+	   		    			key = e;
+	   		    			break;
+	   		    		case 70:
+	   		    			key = f;
+	   		    			break;
+	   		    		case 71:
+	   		    			key = g;
+	   		    			break;
+	   		    		case 72:
+	   		    			key = h;
+	   		    			break;
+	   		    		case 73:
+	   		    			key = i;
+	   		    			break;
+	   		    		case 74:
+	   		    			key = j;
+	   		    			break;
+	   		    		case 75:
+	   		    			key = k;
+	   		    			break;
+	   		    		case 76:
+	   		    			key = l;
+	   		    			break;
+	   		    		case 77:
+	   		    			key = m;
+	   		    			break;
+	   		    		case 78:
+	   		    			key = n;
+	   		    			break;
+	   		    		case 79:
+	   		    			key = o;
+	   		    			break;
+	   		    		case 80:
+	   		    			key = p;
+	   		    			break;
+	   		    		case 81:
+	   		    			key = q;
+	   		    			break;
+	   		    		case 82:
+	   		    			key = r;
+	   		    			break;
+	   		    		case 83:
+	   		    			key = s;
+	   		    			break;
+	   		    		case 84:
+	   		    			key = t;
+	   		    			break;
+	   		    		case 85:
+	   		    			key = u;
+	   		    			break;
+	   		    		case 86:
+	   		    			key = v;
+	   		    			break;
+	   		    		case 87:
+	   		    			key = w;
+	   		    			break;
+	   		    		case 88:
+	   		    			key = xKey;
+	   		    			break;
+	   		    		case 89:
+	   		    			key = yKey;
+	   		    			break;
+	   		    		case 90:
+	   		    			key = zKey;
+	   		    			break;
+	   		    		default:
+	   		    			//problem with Korean IME
+	   		    			if(evt.keyCode == 229)
+	   		    				return;
+	   		    			mainForm.addSpecial(String.fromCharCode(evt.charCode));
+	   		    	}
+	   		    	if(key != null) {
+	   		    		key.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
+	   		    		key.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+	   		    	}
+   		    	}
+		   }
+       		
+       		private function toggleShift():void {
+       			if(shiftButtonDown)
+       				return;
+       			shiftEnabled = !shiftEnabled;
+       			for each(var key:KeyboardKey in keyArray) {
+       				key.toggleShift();
+       			}
+       		}
+       		
+       		private function key_click(event:MouseEvent):void
+	        {
+	        	mainForm.addJamo((event.target as KeyboardKey).currentValue());
+	        	if(shiftEnabled)
+	        		toggleShift();
+	        }
+		]]>
+	</mx:Script>
+	
+	<mx:HBox width="100%" height="25%" horizontalAlign="center" horizontalGap="2">
+		<KeyboardKey label="ㅂ" id="q" smallLetter="ㅂ" capitalLetter="ㅃ" click="key_click(event)" cornerText="Q"/>
+		<KeyboardKey label="ㅈ" id="w" smallLetter="ㅈ" capitalLetter="ㅉ" click="key_click(event)" cornerText="W"/>
+		<KeyboardKey label="ㄷ" id="e" smallLetter="ㄷ" capitalLetter="ㄸ" click="key_click(event)" cornerText="E"/>
+		<KeyboardKey label="ㄱ" id="r" smallLetter="ㄱ" capitalLetter="ㄲ" click="key_click(event)" cornerText="R"/>
+		<KeyboardKey label="ㅅ" id="t" smallLetter="ㅅ" capitalLetter="ㅆ" click="key_click(event)" cornerText="T"/>
+		<KeyboardKey label="ㅛ" id="yKey" smallLetter="ㅛ" capitalLetter="ㅛ" click="key_click(event)" cornerText="Y"/>
+		<KeyboardKey label="ㅕ" id="u" smallLetter="ㅕ" capitalLetter="ㅕ" click="key_click(event)" cornerText="U"/>
+		<KeyboardKey label="ㅑ" id="i" smallLetter="ㅑ" capitalLetter="ㅑ" click="key_click(event)" cornerText="I"/>
+		<KeyboardKey label="ㅐ" id="o" smallLetter="ㅐ" capitalLetter="ㅒ" click="key_click(event)" cornerText="O"/>
+		<KeyboardKey label="ㅔ" id="p" smallLetter="ㅔ" capitalLetter="ㅖ" click="key_click(event)" cornerText="P"/>
+	</mx:HBox>
+	<mx:HBox width="100%" height="25%" horizontalAlign="center" horizontalGap="2">
+	<mx:Spacer width="10%"/>
+		<KeyboardKey label="ㅁ" id="a" smallLetter="ㅁ" capitalLetter="ㅁ" click="key_click(event)" cornerText="A"/>
+		<KeyboardKey label="ㄴ" id="s" smallLetter="ㄴ" capitalLetter="ㄴ" click="key_click(event)" cornerText="S"/>
+		<KeyboardKey label="ㅇ" id="d" smallLetter="ㅇ" capitalLetter="ㅇ" click="key_click(event)" cornerText="D"/>
+		<KeyboardKey label="ㄹ" id="f" smallLetter="ㄹ" capitalLetter="ㄹ" click="key_click(event)" cornerText="F"/>
+		<KeyboardKey label="ㅎ" id="g" smallLetter="ㅎ" capitalLetter="ㅎ" click="key_click(event)" cornerText="G"/>
+		<KeyboardKey label="ㅗ" id="h" smallLetter="ㅗ" capitalLetter="ㅗ" click="key_click(event)" cornerText="H"/>
+		<KeyboardKey label="ㅓ" id="j" smallLetter="ㅓ" capitalLetter="ㅓ" click="key_click(event)" cornerText="J"/>
+		<KeyboardKey label="ㅏ" id="k" smallLetter="ㅏ" capitalLetter="ㅏ" click="key_click(event)" cornerText="K"/>
+		<KeyboardKey label="ㅣ" id="l" smallLetter="ㅣ" capitalLetter="ㅣ" click="key_click(event)" cornerText="L"/>
+		<mx:Spacer width="10%"/>
+	</mx:HBox>
+	<mx:HBox width="100%" height="25%" horizontalAlign="center" horizontalGap="2">
+		<KeyboardKey width="13%" label="Shift" id="shift" click="toggleShift();" toggle="true" selected="{shiftEnabled}"/>
+		<mx:Spacer width="2%"/>
+		<KeyboardKey label="ㅋ" id="zKey" smallLetter="ㅋ" capitalLetter="ㅋ" click="key_click(event)" cornerText="Z"/>
+		<KeyboardKey label="ㅌ" id="xKey" smallLetter="ㅌ" capitalLetter="ㅌ" click="key_click(event)" cornerText="X"/>
+		<KeyboardKey label="ㅊ" id="c" smallLetter="ㅊ" capitalLetter="ㅊ" click="key_click(event)" cornerText="C"/>
+		<KeyboardKey label="ㅍ" id="v" smallLetter="ㅍ" capitalLetter="ㅍ" click="key_click(event)" cornerText="V"/>
+		<KeyboardKey label="ㅠ" id="b" smallLetter="ㅠ" capitalLetter="ㅠ" click="key_click(event)" cornerText="B"/>
+		<KeyboardKey label="ㅜ" id="n" smallLetter="ㅜ" capitalLetter="ㅜ" click="key_click(event)" cornerText="N"/>
+		<KeyboardKey label="ㅡ" id="m" smallLetter="ㅡ" capitalLetter="ㅡ" click="key_click(event)" cornerText="M"/>
+		<mx:Spacer width="2%"/>
+		<KeyboardKey width="13%" label="←" id="del" smallLetter="←" capitalLetter="←" click="mainForm.deleteFordward();"/>
+	</mx:HBox>
+	<mx:HBox width="100%" height="23%" horizontalAlign="center" horizontalGap="2">
+		<KeyboardKey width="13%" label="Copy" id="copy" smallLetter="" capitalLetter="" click="mainForm.copy();"/>
+		<mx:Spacer width="7%"/>
+		<KeyboardKey label="Space" width="60%" id="space" smallLetter=" " capitalLetter=" " click="key_click(event)"/>
+		<mx:Spacer width="7%"/>
+		<KeyboardKey width="13%" label="Enter" id="enter" smallLetter="" capitalLetter="" click="mainForm.execute();"/>
+	</mx:HBox>
+</ResizeWindow>

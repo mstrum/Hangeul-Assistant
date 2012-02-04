@@ -1,0 +1,1220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="vertical" horizontalAlign="center" verticalAlign="top" showCloseButton="true" backgroundColor="#9BCCFE" title="Click or use numpad" borderAlpha="1" color="#0B333C" headerColors="[#ffffff,#FEDA4A]" headerHeight="20" borderThicknessBottom="5" borderThicknessLeft="5" borderThicknessRight="5" paddingLeft="2" paddingRight="2" paddingTop="2" paddingBottom="2" borderColor="#FEDA4A" borderThicknessTop="2"
+	creationComplete="afterInit()" close="onClose(event)" xmlns:ns1="com.*" width="190" height="242" verticalGap="2">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+       		import mx.events.CloseEvent;
+       		import flash.events.TimerEvent;
+    		import flash.utils.Timer;
+    		import mx.controls.Alert;
+       		
+       		public var mainForm:hangeulAssistant = null;
+
+			public var keyArray:Array = new Array();
+			public var currentMode:String = "";
+			
+       		// Just run once
+       		public var buttonWaitTimer:Timer = new Timer(3000, 1);
+		    
+		    private function afterInit():void {
+		    	keyArray.push(key1);
+       			keyArray.push(key2);
+       			keyArray.push(key3);
+       			keyArray.push(key4);
+       			keyArray.push(key5);
+       			keyArray.push(key6);
+       			keyArray.push(key7);
+       			keyArray.push(key8);
+       			keyArray.push(key9);
+       			keyArray.push(keyStar);
+       			keyArray.push(key0);
+       			keyArray.push(keyPound);
+       			
+       			currentMode = "sky";
+       			
+       			for each(var key:CellphoneKey in keyArray) {
+       				key.parentCellphone = this;
+       				key.setMode("sky");
+       			}
+		    	
+		    	addEventListener(KeyboardEvent.KEY_DOWN,keyDown);
+       			addEventListener(KeyboardEvent.KEY_UP,keyUp);
+       			
+       			// designates listeners for the interval and completion events
+	            buttonWaitTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete);
+       			
+       			this.setFocus();
+       		}
+       		
+       		private function onClose(evt:CloseEvent):void {
+       			// Stop window from closing on enter
+       			if(evt.detail == 0) {
+       				evt.stopImmediatePropagation();
+       			}
+       		}
+       		
+       		public function setMode(mode:String):void
+       		{
+       			switch(mode)
+       			{
+       				case "sky":
+       				case "cyon":
+       				case "any":
+       				case "motorola":
+       					break;
+       				default:
+       					Alert.show(mode + " mode not supported, check spelling");
+       					return;
+       			}
+       			currentMode = mode;
+       			for each(var key:CellphoneKey in keyArray) {
+       				key.setMode(mode);
+       			}
+       		}
+       		
+       		private function getKey(code:uint):CellphoneKey {
+       			var key:CellphoneKey = null;
+       			switch(code)
+	   		    	{
+	   		    		case 49:
+	   		    		case 103:
+	   		    			key = key1;
+	   		    			break;
+	   		    		case 50:
+	   		    		case 104:
+	   		    			key = key2;
+	   		    			break;
+	   		    		case 51:
+	   		    		case 105:
+	   		    			key = key3;
+	   		    			break;
+	   		    		case 52:
+	   		    		case 100:
+	   		    			key = key4;
+	   		    			break;
+	   		    		case 53:
+	   		    		case 101:
+	   		    			key = key5;
+	   		    			break;
+	   		    		case 54:
+	   		    		case 102:
+	   		    			key = key6;
+	   		    			break;
+	   		    		case 55:
+	   		    		case 97:
+	   		    			key = key7;
+	   		    			break;
+	   		    		case 56:
+	   		    		case 98:
+	   		    			key = key8;
+	   		    			break;
+	   		    		case 57:
+	   		    		case 99:
+	   		    			key = key9;
+	   		    			break;
+	   		    		case 48:
+	   		    		case 96:
+	   		    			key = key0;
+	   		    			break;
+	   		    		case 106:
+	   		    		case 189:
+	   		    			key = keyStar;
+	   		    			break;
+	   		    		case 109:
+	   		    		case 187:
+	   		    			key = keyPound;
+	   		    			break;
+	   		    	}
+       			
+   		    	return key;
+       		}
+       		
+       		private function keyUp(evt:KeyboardEvent):void{
+       			var key:CellphoneKey = getKey(evt.keyCode);
+   		    	if(key != null)
+   					key.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
+       		}
+       		
+   		    private function keyDown(evt:KeyboardEvent):void{
+   		    	var key:CellphoneKey = getKey(evt.keyCode);
+   		    	if(key != null) {
+   		    		key.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
+   		    		key.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+   		    	} else {
+   		    		switch(evt.keyCode)
+	   		    	{
+	   		    		case 8:
+	   		    			mainForm.deleteFordward();
+	   		    			break;
+	   		    		case 46:
+	   		    			mainForm.deleteBack();
+	   		    			break;
+	   		    		case 27:
+	   		    			dispatchEvent(new CloseEvent(CloseEvent.CLOSE, false, false, 1));
+	   		    			break;
+	   		    		case 108:
+	   		    		case 13:
+	   		    			mainForm.execute();
+	   		    			break;
+	   		    		case 37:
+	   		    			mainForm.moveCursorLeft();
+	   		    			return;
+	   		    		case 39:
+	   		    			mainForm.moveCursorRight();
+	   		    			return;
+	   		    		default:
+	   		    			mainForm.addSpecial(String.fromCharCode(evt.charCode));
+	   		    	}
+   		    	}
+		   }
+		   
+		   private var previousNumber:String = "";
+		   private var previousLetter:String = "";
+		   private var skyConsonants:Array = new Array('1','4','5','7','8','*','0');
+		   
+		   private function postAdd(letter:String):void
+		   {
+		   		previousLetter = letter;
+		   		
+	        	if(buttonWaitTimer.running)
+	        	{
+	        		//Alert.show("reset");
+	        		buttonWaitTimer.reset();
+	        	}
+	        	buttonWaitTimer.start();
+		   }
+		   
+		   private function addJamo(jamo:String):void
+		   {
+		   		mainForm.addJamo(jamo);
+		   		postAdd(jamo);
+		   }
+		   
+		   private function addSpecial(letter:String):void
+		   {
+		   		mainForm.addSpecial(letter);
+		   		postAdd(letter);
+		   }
+		   
+		   private function preReplace(letter:String):void
+		   {
+		   		if(buttonWaitTimer.running)
+		   		{
+		   			mainForm.deleteFordward();
+		   		}
+		   }
+		   
+		   private function replaceJamo(jamo:String):void
+		   {
+		   		preReplace(jamo);
+		   		addJamo(jamo);
+		   }
+		   
+		   private function replaceSpecial(letter:String):void
+		   {
+		   		preReplace(letter);
+		   		addSpecial(letter);
+		   }
+		   
+		   private function key_click(event:MouseEvent):void
+	        {
+	        	var currentNumber:String = (event.target as CellphoneKey).value;
+	        	var isSame:Boolean = currentNumber == previousNumber;
+	        	
+	        	if(currentMode == "sky") {
+	        		processSky(currentNumber, isSame);
+	        	} else if(currentMode == "any") {
+	        		processAny(currentNumber, isSame);
+	        	} else if(currentMode == "cyon") {
+	        		processCyon(currentNumber, isSame);
+	        	} else if(currentMode == "motorola") {
+	        		processMotorola(currentNumber, isSame);
+	        	}
+	        	
+	        	previousNumber = currentNumber;
+	        }
+	        
+	        private function processSky(currentNumber:String, isSame:Boolean):void
+	        {
+	        	switch(currentNumber)
+	        	{
+		        	case "1":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄱ")
+	        					{
+	        						replaceJamo("ㅋ");
+	        					} else if(previousLetter == "ㅋ")
+	        					{
+	        						replaceJamo("ㄲ");
+	        					} else if(previousLetter == "ㄲ")
+	        					{
+	        						replaceSpecial("1");
+	        					} else {
+	        						replaceJamo("ㄱ");
+	        					}
+	        				} else {
+	        					addJamo("ㄱ");
+	        				}
+	        				break;
+	        			case "2":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅣ")
+	        					{
+	        						replaceJamo("ㅡ");
+	        					} else if(previousLetter == "ㅡ")
+	        					{
+	        						replaceSpecial("ㅢ");
+	        					} else if(previousLetter == "ㅢ")
+	        					{
+	        						replaceSpecial("2");
+	        					} else
+	        					{
+	        						replaceJamo("ㅣ");
+	        					}
+	        				} else {
+	        					if(previousLetter == "ㅏ") {
+	        						replaceJamo("ㅐ");
+	        					} else if(previousLetter == "ㅑ") {
+	        						replaceJamo("ㅒ");
+	        					} else if(previousLetter == "ㅓ") {
+	        						replaceJamo("ㅔ");
+	        					} else if(previousLetter == "ㅕ") {
+	        						replaceJamo("ㅖ");
+	        					} else {
+	        						addJamo("ㅣ");
+	        					}
+	        				}
+	        				break;
+	        			case "3":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅏ")
+	        					{
+	        						replaceJamo("ㅑ");
+	        					} else if(previousLetter == "ㅑ")
+	        					{
+	        						replaceSpecial("3");
+	        					} else
+	        					{
+	        						replaceJamo("ㅏ");
+	        					}
+	        				} else {
+	        					addJamo("ㅏ");
+	        				}
+	        				break;
+	        			case "4":
+		        			if(isSame)
+	        				{
+	        					if(previousLetter == "ㄷ")
+	        					{
+	        						replaceJamo("ㅌ");
+	        					} else if(previousLetter == "ㅌ")
+	        					{
+	        						replaceJamo("ㄸ");
+	        					} else if(previousLetter == "ㄸ")
+	        					{
+	        						replaceSpecial("4");
+	        					} else {
+	        						replaceJamo("ㄷ");
+	        					}
+	        				} else {
+	        					addJamo("ㄷ");
+	        				}
+	        				break;
+	        			case "5":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄴ")
+	        					{
+	        						replaceJamo("ㄹ");
+	        					} else if(previousLetter == "ㄹ")
+	        					{
+	        						replaceSpecial("5");
+	        					} else {
+	        						replaceJamo("ㄴ");
+	        					}
+	        				} else {
+	        					addJamo("ㄴ");
+	        				}
+	        				break;
+	        			case "6":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅓ")
+	        					{
+	        						replaceJamo("ㅕ");
+	        					} else if(previousLetter == "ㅕ")
+	        					{
+									replaceSpecial("6");
+	        					} else
+	        					{
+	        						replaceJamo("ㅓ");
+	        					}
+	        				} else {
+	        					addJamo("ㅓ");
+	        				}
+	        				break;
+	        			case "7":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅁ")
+	        					{
+	        						replaceJamo("ㅅ");
+	        					} else if(previousLetter == "ㅅ")
+	        					{
+	        						replaceJamo("ㅆ");
+	        					} else if(previousLetter == "ㅆ")
+	        					{
+	        						replaceSpecial("7");
+	        					} else {
+	        						replaceJamo("ㅁ");
+	        					}
+	        				} else {
+	        					addJamo("ㅁ");
+	        				}
+	        				break;
+	        			case "8":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅂ")
+	        					{
+	        						replaceJamo("ㅍ");
+	        					} else if(previousLetter == "ㅍ")
+	        					{
+	        						replaceJamo("ㅃ");
+	        					} else if(previousLetter == "ㅃ")
+	        					{
+	        						replaceSpecial("8");
+	        					} else {
+	        						replaceJamo("ㅂ");
+	        					}
+	        				} else {
+	        					addJamo("ㅂ");
+	        				}
+	        				break;
+	        			case "9":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅗ")
+	        					{
+	        						replaceJamo("ㅛ");
+	        					} else if(previousLetter == "ㅛ")
+	        					{
+									replaceSpecial("9");
+	        					} else
+	        					{
+	        						replaceJamo("ㅗ");
+	        					}
+	        				} else {
+	        					addJamo("ㅗ");
+	        				}
+	        				break;
+	        			case "*":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅈ")
+	        					{
+	        						replaceJamo("ㅊ");
+	        					} else if(previousLetter == "ㅊ")
+	        					{
+	        						replaceJamo("ㅉ");
+	        					} else if(previousLetter == "ㅉ")
+	        					{
+	        						replaceSpecial("*");
+	        					} else {
+	        						replaceJamo("ㅈ");
+	        					}
+	        				} else {
+	        					addJamo("ㅈ");
+	        				}
+	        				break;
+	        			case "0":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅇ")
+	        					{
+	        						replaceJamo("ㅎ");
+	        					} else if(previousLetter == "ㅎ")
+	        					{
+	        						replaceSpecial("0");
+	        					} else {
+	        						replaceJamo("ㅇ");
+	        					}
+	        				} else {
+	        					addJamo("ㅇ");
+	        				}
+	        				break;
+	        			case "#":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅜ")
+	        					{
+	        						replaceJamo("ㅠ");
+	        					} else if(previousLetter == "ㅠ")
+	        					{
+									replaceSpecial("#");
+	        					} else
+	        					{
+	        						replaceJamo("ㅜ");
+	        					}
+	        				} else {
+	        					addJamo("ㅜ");
+	        				}
+	        				break;
+        		}
+	        }
+	        
+	        private function processAny(currentNumber:String, isSame:Boolean):void
+	        {	   
+	        	switch(currentNumber)
+	        	{
+		        	case "1":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅣ")
+	        					{
+	        						replaceSpecial("1");
+	        					} else
+	        					{
+	        						replaceJamo("ㅣ");
+	        					}
+	        				} else {
+	        					if(previousLetter == "ㅏ") {
+	        						replaceJamo("ㅐ");
+	        					} else if(previousLetter == "ㅑ") {
+	        						replaceJamo("ㅒ");
+	        					} else if(previousLetter == ".") {
+	        						addJamo("ㅓ");
+	        					} else if(previousLetter == "..") {
+	        						addJamo("ㅕ");
+	        					} else {
+	        						addJamo("ㅣ");
+	        					}
+	        				}
+	        				break;
+	        			case "2":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅏ")
+	        					{
+	        						replaceJamo("ㅑ");
+	        					} else if(previousLetter == "ㅜ")
+	        					{
+	        						replaceSpecial("ㅠ");
+	        					} else
+	        					{
+	        						previousLetter = "..";
+	        					}
+	        				} else {
+	        					if(previousLetter == "ㅣ") {
+	        						replaceJamo("ㅏ");
+	        					} else if(previousLetter == "ㅡ") {
+	        						replaceJamo("ㅜ");
+	        					} else {
+	        						previousLetter = ".";
+	        					}
+	        				}
+	        				break;
+	        			case "3":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅡ")
+	        					{
+	        						replaceSpecial("3");
+	        					} else
+	        					{
+	        						replaceJamo("ㅡ");
+	        					}
+	        				} else {
+	        					if(previousLetter == ".") {
+	        						addJamo("ㅗ");
+	        					} else if(previousLetter == "..") {
+	        						addJamo("ㅛ");
+	        					} else {
+	        						addJamo("ㅣ");
+	        					}
+	        				}
+	        				break;
+	        			case "4":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄱ")
+	        					{
+	        						replaceJamo("ㅋ");
+	        					} else if(previousLetter == "ㅋ")
+	        					{
+	        						replaceJamo("ㄲ");
+	        					} else if(previousLetter == "ㄲ")
+	        					{
+	        						replaceSpecial("4");
+	        					} else {
+	        						replaceJamo("ㄱ");
+	        					}
+	        				} else {
+	        					addJamo("ㄱ");
+	        				}
+	        				break;
+	        			case "5":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄴ")
+	        					{
+	        						replaceJamo("ㄹ");
+	        					} else if(previousLetter == "ㄹ")
+	        					{
+	        						replaceSpecial("5");
+	        					} else {
+	        						replaceJamo("ㄴ");
+	        					}
+	        				} else {
+	        					addJamo("ㄴ");
+	        				}
+	        				break;
+	        			case "6":
+		        			if(isSame)
+	        				{
+	        					if(previousLetter == "ㄷ")
+	        					{
+	        						replaceJamo("ㅌ");
+	        					} else if(previousLetter == "ㅌ")
+	        					{
+	        						replaceJamo("ㄸ");
+	        					} else if(previousLetter == "ㄸ")
+	        					{
+	        						replaceSpecial("6");
+	        					} else {
+	        						replaceJamo("ㄷ");
+	        					}
+	        				} else {
+	        					addJamo("ㄷ");
+	        				}
+	        				break;
+	        			case "7":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅂ")
+	        					{
+	        						replaceJamo("ㅍ");
+	        					} else if(previousLetter == "ㅍ")
+	        					{
+	        						replaceJamo("ㅃ");
+	        					} else if(previousLetter == "ㅃ")
+	        					{
+	        						replaceSpecial("7");
+	        					} else {
+	        						replaceJamo("ㅂ");
+	        					}
+	        				} else {
+	        					addJamo("ㅂ");
+	        				}
+	        				break;
+	        			case "8":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅅ")
+	        					{
+	        						replaceJamo("ㅎ");
+	        					} else if(previousLetter == "ㅎ")
+	        					{
+	        						replaceJamo("ㅆ");
+	        					} else if(previousLetter == "ㅆ")
+	        					{
+	        						replaceSpecial("8");
+	        					} else {
+	        						replaceJamo("ㅅ");
+	        					}
+	        				} else {
+	        					addJamo("ㅅ");
+	        				}
+	        				break;
+	        			case "9":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅈ")
+	        					{
+	        						replaceJamo("ㅊ");
+	        					} else if(previousLetter == "ㅊ")
+	        					{
+	        						replaceJamo("ㅉ");
+	        					} else if(previousLetter == "ㅉ")
+	        					{
+	        						replaceSpecial("9");
+	        					} else {
+	        						replaceJamo("ㅈ");
+	        					}
+	        				} else {
+	        					addJamo("ㅈ");
+	        				}
+	        				break;
+	        			case "*":
+	        				replaceSpecial("*");
+	        				break;
+	        			case "0":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅇ")
+	        					{
+	        						replaceJamo("ㅁ");
+	        					} else if(previousLetter == "ㅁ")
+	        					{
+	        						replaceSpecial("0");
+	        					} else {
+	        						replaceJamo("ㅇ");
+	        					}
+	        				} else {
+	        					addJamo("ㅇ");
+	        				}
+	        				break;
+	        			case "#":
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "#")
+	        					{
+	        						replaceSpecial("@");
+	        					} else
+	        					{
+	        						replaceSpecial("#");
+	        					}
+	        				} else {
+	        					replaceSpecial("#");
+	        				}
+	        				break;
+        		}
+	        }   
+	        
+	        private function processCyon(currentNumber:String, isSame:Boolean):void
+	        {
+	        	switch(currentNumber)
+	        	{
+		        	case "1"://ㄱ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄱ")
+	        					{
+	        						replaceSpecial("1");
+	        					} else {
+	        						replaceJamo("ㄱ");
+	        					}
+	        				} else {
+	        					addJamo("ㄱ");
+	        				}
+	        				break;
+	        			case "2"://ㄴ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄴ")
+	        					{
+	        						replaceSpecial("2");
+	        					} else
+	        					{
+	        						replaceJamo("ㄴ");
+	        					}
+	        				} else {
+	        					addJamo("ㄴ");
+	        				}
+	        				break;
+	        			case "3"://ㅏㅓ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅏ")
+	        					{
+	        						replaceJamo("ㅓ");
+	        					} else if(previousLetter == "ㅓ")
+	        					{
+	        						replaceSpecial("3");
+	        					} else
+	        					{
+	        						replaceJamo("ㅏ");
+	        					}
+	        				} else {
+	        					addJamo("ㅏ");
+	        				}
+	        				break;
+	        			case "4"://ㄹ
+		        			if(isSame)
+	        				{
+	        					if(previousLetter == "ㄹ")
+	        					{
+	        						replaceSpecial("4");
+	        					} else {
+	        						replaceJamo("ㄹ");
+	        					}
+	        				} else {
+	        					addJamo("ㄹ");
+	        				}
+	        				break;
+	        			case "5"://ㅁ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅁ")
+	        					{
+	        						replaceSpecial("5");
+	        					} else {
+	        						replaceJamo("ㅁ");
+	        					}
+	        				} else {
+	        					addJamo("ㅁ");
+	        				}
+	        				break;
+	        			case "6"://ㅗㅜ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅗ")
+	        					{
+	        						replaceJamo("ㅜ");
+	        					} else if(previousLetter == "ㅜ")
+	        					{
+									replaceSpecial("6");
+	        					} else
+	        					{
+	        						replaceJamo("ㅗ");
+	        					}
+	        				} else {
+	        					addJamo("ㅗ");
+	        				}
+	        				break;
+	        			case "7"://ㅅ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅅ")
+	        					{
+	        						replaceSpecial("7");
+	        					} else {
+	        						replaceJamo("ㅅ");
+	        					}
+	        				} else {
+	        					addJamo("ㅅ");
+	        				}
+	        				break;
+	        			case "8"://ㅇ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅇ")
+	        					{
+	        						replaceSpecial("8");
+	        					} else {
+	        						replaceJamo("ㅇ");
+	        					}
+	        				} else {
+	        					addJamo("ㅇ");
+	        				}
+	        				break;
+	        			case "9"://ㅣ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅣ")
+	        					{
+	        						replaceSpecial("9");
+	        					} else
+	        					{
+	        						replaceJamo("ㅣ");
+	        					}
+	        				} else {
+	        					if(previousLetter == "ㅓ")
+	        					{
+	        						replaceJamo("ㅔ");
+	        					} else if(previousLetter == "ㅏ")
+	        					{
+									replaceJamo("ㅐ");
+	        					} else if(previousLetter == "ㅕ")
+	        					{
+	        						replaceJamo("ㅖ");
+	        					} else if(previousLetter == "ㅑ")
+	        					{
+									replaceJamo("ㅒ");
+	        					} else
+	        					{
+	        						addJamo("ㅣ");
+	        					}
+	        				}
+	        				break;
+	        			case "*"://획추가
+	        				if(isSame)
+	        				{
+	        					addSpecial("*");
+	        				} else {
+	        					switch(previousLetter)
+	        					{
+	        						case "ㄱ":
+	        							replaceJamo("ㅋ");
+	        							break;
+	        						case "ㄷ":
+	        							replaceJamo("ㅌ");
+	        							break;
+	        						case "ㅂ":
+	        							replaceJamo("ㅍ");
+	        							break;
+	        						case "ㅈ":
+	        							replaceJamo("ㅊ");
+	        							break;
+	        						case "ㄴ":
+	        							replaceJamo("ㄷ");
+	        							break;
+	        						case "ㅇ":
+	        							replaceJamo("ㅎ");
+	        							break;
+	        						case "ㅅ":
+	        							replaceJamo("ㅈ");
+	        							break;
+	        						case "ㅏ":
+	        							replaceJamo("ㅑ");
+	        							break;
+	        						case "ㅓ":
+	        							replaceJamo("ㅕ");
+	        							break;
+	        						case "ㅜ":
+	        							replaceJamo("ㅠ");
+	        							break;
+	        						case "ㅗ":
+	        							replaceJamo("ㅛ");
+	        							break;
+	        						default:
+	        							addSpecial("*");
+	        					}
+	        				}
+	        				break;
+	        			case "0"://ㅡ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅡ")
+	        					{
+	        						replaceSpecial("0");
+	        					} else {
+	        						replaceJamo("ㅡ");
+	        					}
+	        				} else {
+	        					addJamo("ㅡ");
+	        				}
+	        				break;
+	        			case "#"://쌍자음
+	        				if(isSame)
+	        				{
+	        					addSpecial("#");
+	        				} else {
+	        					switch(previousLetter)
+	        					{
+	        						case "ㄱ":
+	        							replaceJamo("ㄲ");
+	        							break;
+	        						case "ㄷ":
+	        							replaceJamo("ㄸ");
+	        							break;
+	        						case "ㅂ":
+	        							replaceJamo("ㅃ");
+	        							break;
+	        						case "ㅈ":
+	        							replaceJamo("ㅉ");
+	        							break;
+	        						default:
+	        							addSpecial("#");
+	        					}
+	        				}
+	        				break;
+        		}
+	        }
+	        
+	        private function processMotorola(currentNumber:String, isSame:Boolean):void
+	        {
+	        	switch(currentNumber)
+	        	{
+		        	case "1"://ㄱㅋ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄱ")
+	        					{
+	        						replaceJamo("ㄲ");
+	        					} else if(previousLetter == "ㄲ")
+	        					{
+	        						replaceSpecial("1");
+	        					} else {
+	        						replaceJamo("ㄱ");
+	        					}
+	        				} else {
+	        					addJamo("ㄱ");
+	        				}
+	        				break;
+	        			case "2"://ㄴㅁ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄴ")
+	        					{
+	        						replaceJamo("ㅁ");
+	        					} else if(previousLetter == "ㅁ")
+	        					{
+	        						replaceSpecial("2");
+	        					} else {
+	        						replaceJamo("ㄴ");
+	        					}
+	        				} else {
+	        					addJamo("ㄴ");
+	        				}
+	        				break;
+	        			case "3"://ㅏㅓ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅏ")
+	        					{
+	        						replaceJamo("ㅓ");
+	        					} else if(previousLetter == "ㅓ")
+	        					{
+	        						replaceSpecial("3");
+	        					} else
+	        					{
+	        						replaceJamo("ㅏ");
+	        					}
+	        				} else {
+	        					addJamo("ㅏ");
+	        				}
+	        				break;
+	        			case "4"://ㄷㅌ
+		        			if(isSame)
+	        				{
+	        					if(previousLetter == "ㄷ")
+	        					{
+	        						replaceJamo("ㄸ");
+	        					} else if(previousLetter == "ㄸ")
+	        					{
+	        						replaceSpecial("4");
+	        					} else {
+	        						replaceJamo("ㄷ");
+	        					}
+	        				} else {
+	        					addJamo("ㄷ");
+	        				}
+	        				break;
+	        			case "5"://ㄹ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㄹ")
+	        					{
+	        						replaceSpecial("5");
+	        					} else {
+	        						replaceJamo("ㄹ");
+	        					}
+	        				} else {
+	        					addJamo("ㄹ");
+	        				}
+	        				break;
+	        			case "6"://ㅗㅜ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅗ")
+	        					{
+	        						replaceJamo("ㅜ");
+	        					} else if(previousLetter == "ㅜ")
+	        					{
+									replaceSpecial("6");
+	        					} else
+	        					{
+	        						replaceJamo("ㅗ");
+	        					}
+	        				} else {
+	        					addJamo("ㅗ");
+	        				}
+	        				break;
+	        			case "7"://ㅂㅍ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅂ")
+	        					{
+	        						replaceJamo("ㅃ");
+	        					} else if(previousLetter == "ㅃ")
+	        					{
+	        						replaceSpecial("7");
+	        					} else {
+	        						replaceJamo("ㅂ");
+	        					}
+	        				} else {
+	        					addJamo("ㅂ");
+	        				}
+	        				break;
+	        			case "8"://ㅅ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅅ")
+	        					{
+	        						replaceJamo("ㅆ");
+	        					} else if(previousLetter == "ㅆ")
+	        					{
+	        						replaceSpecial("8");
+	        					} else {
+	        						replaceJamo("ㅅ");
+	        					}
+	        				} else {
+	        					addJamo("ㅅ");
+	        				}
+	        				break;
+	        			case "9"://ㅣㅡ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅣ")
+	        					{
+	        						replaceJamo("ㅡ");
+	        					} else if(previousLetter == "ㅡ")
+	        					{
+									replaceSpecial("ㅢ");
+	        					} else if(previousLetter == "ㅢ")
+	        					{
+									replaceSpecial("9");
+	        					} else
+	        					{
+	        						replaceJamo("ㅣ");
+	        					}
+	        				} else {
+	        					if(previousLetter == "ㅓ")
+	        					{
+	        						replaceJamo("ㅔ");
+	        					} else if(previousLetter == "ㅏ")
+	        					{
+									replaceJamo("ㅐ");
+	        					} else if(previousLetter == "ㅕ")
+	        					{
+	        						replaceJamo("ㅖ");
+	        					} else if(previousLetter == "ㅑ")
+	        					{
+									replaceJamo("ㅒ");
+	        					} else
+	        					{
+	        						addJamo("ㅣ");
+	        					}
+	        				}
+	        				break;
+	        			case "*"://ㅈㅊ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅈ")
+	        					{
+	        						replaceJamo("ㅉ");
+	        					} else if(previousLetter == "ㅉ")
+	        					{
+	        						replaceSpecial("*");
+	        					} else {
+	        						replaceJamo("ㅈ");
+	        					}
+	        				} else {
+	        					addJamo("ㅈ");
+	        				}
+	        				break;
+	        			case "0"://ㅇㅎ
+	        				if(isSame)
+	        				{
+	        					if(previousLetter == "ㅇ")
+	        					{
+	        						replaceJamo("ㅎ");
+	        					} else if(previousLetter == "ㅎ")
+	        					{
+	        						replaceSpecial("0");
+	        					} else {
+	        						replaceJamo("ㅇ");
+	        					}
+	        				} else {
+	        					addJamo("ㅇ");
+	        				}
+	        				break;
+	        			case "#"://획추가
+	        				if(isSame)
+	        				{
+	        					addSpecial("#");
+	        				} else {
+	        					switch(previousLetter)
+	        					{
+	        						case "ㄱ":
+	        							replaceJamo("ㅋ");
+	        							break;
+	        						case "ㄷ":
+	        							replaceJamo("ㅌ");
+	        							break;
+	        						case "ㅂ":
+	        							replaceJamo("ㅍ");
+	        							break;
+	        						case "ㅈ":
+	        							replaceJamo("ㅊ");
+	        							break;
+	        						case "ㅏ":
+	        							replaceJamo("ㅑ");
+	        							break;
+	        						case "ㅓ":
+	        							replaceJamo("ㅕ");
+	        							break;
+	        						case "ㅜ":
+	        							replaceJamo("ㅠ");
+	        							break;
+	        						case "ㅗ":
+	        							replaceJamo("ㅛ");
+	        							break;
+	        						default:
+	        							addSpecial("#");
+	        					}
+	        				}
+	        				break;
+        		}
+	        }
+	
+	        public function onTimerComplete(event:TimerEvent):void
+	        {
+	        	previousLetter = "";
+	        	// insert number if held
+	            //mainForm.finishBlock();
+	        }
+	        
+	        public function setModeCombo():void
+	        {
+	        	switch(modeCombo.selectedIndex)
+	        	{
+	        		case 0:
+	        			setMode("sky");
+	        			break;
+	        		case 1:
+	        			setMode("any");
+	        			break;
+	        		case 2:
+	        			setMode("cyon");
+	        			break;
+	        		case 3:
+	        			setMode("motorola");
+	        			break;
+	        	}
+	        }
+
+    ]]>
+	</mx:Script>
+	
+	<mx:ComboBox id="modeCombo" width="100%" change="setModeCombo()">
+		<mx:dataProvider>
+	        <mx:String>Sky™</mx:String>
+	        <mx:String>Anycall, EVER</mx:String>
+	        <mx:String>CYON, CanU</mx:String>
+	        <mx:String>Motorola</mx:String>
+    	</mx:dataProvider>
+	</mx:ComboBox>
+	<mx:VBox label="Sky" width="100%" height="100%" verticalGap="0" id="keypad">
+		<mx:HBox width="100%" height="25%" horizontalAlign="center" verticalAlign="middle" horizontalGap="2" paddingLeft="0" paddingRight="0">
+			<ns1:CellphoneKey id="key1" label="1" click="key_click(event)" value="1" textSky="ㄱ ㅋ" textAny="| " textCyon="ㄱ " textMotorola="ㄱ ㅋ"/>
+			<ns1:CellphoneKey id="key2" label="2" click="key_click(event)" value="2" textSky="ㅣ ㅡ" textAny="• " textCyon="ㄴ " textMotorola="ㄴ ㅁ"/>
+			<ns1:CellphoneKey id="key3" label="3" click="key_click(event)" value="3" textSky="ㅏ ㅑ" textAny="ㅡ " textCyon="ㅏ ㅓ" textMotorola="ㅏ ㅓ"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="25%" horizontalAlign="center" verticalAlign="middle" horizontalGap="2">
+			<ns1:CellphoneKey id="key4" label="4" click="key_click(event)" value="4" textSky="ㄷ ㅌ" textAny="ㄱ ㅋ" textCyon="ㄹ " textMotorola="ㄷ ㅌ"/>
+			<ns1:CellphoneKey id="key5" label="5" click="key_click(event)" value="5" textSky="ㄴ ㄹ" textAny="ㄴ ㄹ" textCyon="ㅁ " textMotorola="ㄹ "/>
+			<ns1:CellphoneKey id="key6" label="6" click="key_click(event)" value="6" textSky="ㅓ ㅕ" textAny="ㄷ ㅌ" textCyon="ㅗ ㅜ" textMotorola="ㅗ ㅜ"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="25%" horizontalAlign="center" verticalAlign="middle" horizontalGap="2">
+			<ns1:CellphoneKey id="key7" label="7" click="key_click(event)" value="7" textSky="ㅁ ㅅ" textAny="ㅂ ㅍ" textCyon="ㅅ " textMotorola="ㅂ ㅍ"/>
+			<ns1:CellphoneKey id="key8" label="8" click="key_click(event)" value="8" textSky="ㅂ ㅍ" textAny="ㅅ ㅎ" textCyon="ㅇ " textMotorola="ㅅ "/>
+			<ns1:CellphoneKey id="key9" label="9" click="key_click(event)" value="9" textSky="ㅗ ㅛ" textAny="ㅈ ㅊ" textCyon="| " textMotorola="ㅣ ㅡ"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="25%" horizontalAlign="center" verticalAlign="middle" horizontalGap="2">
+			<ns1:CellphoneKey id="keyStar" label="*" click="key_click(event)" value="*" textSky="ㅈ ㅊ" textAny="" textCyon="획추가" textMotorola="ㅈ ㅊ"/>
+			<ns1:CellphoneKey id="key0" label="0" click="key_click(event)" value="0" textSky="ㅇ ㅎ" textAny="ㅇ ㅁ" textCyon="ㅡ " textMotorola="ㅇ ㅎ"/>
+			<ns1:CellphoneKey id="keyPound" label="#" click="key_click(event)" value="#" textSky="ㅜ ㅠ" textAny="@ " textCyon="쌍자음 " textMotorola="획추가"/>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:LinkButton label="How do I use this?" width="100%" paddingRight="2" selectionColor="#C0DBF8">
+		<mx:click>navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Help:How_to_text_message'), '_blank');</mx:click>
+	</mx:LinkButton>
+</mx:TitleWindow>

@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:com="com.*" xmlns:ns1="*"
+	layout="vertical" width="100%" height="100%" paddingTop="2" paddingLeft="5" paddingRight="5" paddingBottom="5" fontSize="11" color="#000000" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#0166CB, #0166CB]" themeColor="#FFCC00"
+    creationComplete="init();" backgroundColor="#0166CB" xmlns:ns2="flexlib.containers.*">
+	<mx:keyDown>if(event.keyCode == Keyboard.F2) openKeyboardWindow();</mx:keyDown>
+<!--
+	Copyright Matt Strum
+	Created April 3, 2009
+-->
+	<mx:Script>
+		<![CDATA[
+			import com.*;
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+       		import mx.managers.PopUpManager;
+       		import mx.events.CloseEvent;
+       		
+       		private var phoneWindow:PhoneInputWindow;
+       		private var keyboardWindow:KeyboardInputWindow;
+       		private var aboutWindow:AboutWindow;
+       		private var helpWindow:HelpWindow;
+       		
+       		private var currentChar:Character = new Character;
+            
+            private function init():void {
+            	// Startup options
+            	try{
+	            	if(Application.application.parameters.input != null)
+	            	{
+	            		var input:String = Application.application.parameters.input;
+	            		if(input == "keyboard") {
+	            			openKeyboardWindow();
+	            		} else if(input == "cellphone") {
+	            			openPhoneWindow();
+	            			if(Application.application.parameters.cellmode != null)
+			            	{
+			            		phoneWindow.setMode(Application.application.parameters.cellmode);
+			            	}
+	            		}
+	            	}
+	            	if(Application.application.parameters.mode != null)
+	            	{
+	            		var mode:String = Application.application.parameters.mode;
+	            		if(mode == "essay") {
+	            			this.toggleMode()();
+	            		}
+	            	}
+            	} catch(all:Error) {
+            	}
+            	
+            	// First-run
+            	try{
+            		var so:SharedObject = SharedObject.getLocal("alreadyrun");
+					if (so.size == 0)
+					{
+					    so.data.value = "1";
+					    openHelpWindow();
+					}
+					so.flush();
+            	} catch(all:Error) {
+            	}
+            }
+       		
+       		private function createAllExamples(original:String):void
+    		{
+    			var exampleWord:Verb = new Verb;
+    			var examplesArray:Array = new Array;
+    			
+    			exampleWord.Load(original);
+		    	if(exampleWord.IsVerb)
+		    	{
+		    		exampleWord.contract = contractResults.selected;
+		    		
+		    		// Verb Base
+			    	var base:Verb = exampleWord.ClonedVerb();
+			    	base.AddDa();
+			    	
+			    	// Intimate
+			    	var intimate:Verb = exampleWord.ClonedVerb();
+			    	intimate.AddIntimateEnding();
+			    	
+			    	// Polite
+			    	var polite:Verb = exampleWord.ClonedVerb();
+			    	polite.AddPoliteEnding();
+			    	
+			    	// Formal Statement
+			    	var formalStatement:Verb = exampleWord.ClonedVerb();
+			    	formalStatement.AddFormalStatementEnding();
+			    	
+			    	// Formal Question
+			    	var formalQuestion:Verb = exampleWord.ClonedVerb();
+			    	formalQuestion.AddFormalQuestionEnding();
+			    	
+			    	// Honorific
+			    	var honorific:Verb = exampleWord.ClonedVerb();
+			    	honorific.AddHonorific();
+			    	honorific.AddDa();
+			    	
+			    	// Past
+			    	var past:Verb = exampleWord.ClonedVerb();
+			    	past.AddPast();
+			    	past.AddDa();
+			    	
+			    	// Past Perfect
+			    	var pastPerfect:Verb = exampleWord.ClonedVerb();
+			    	pastPerfect.AddPastPerfect();
+			    	pastPerfect.AddDa();
+			    	
+			    	// Future short
+			    	var futureShort:Verb = exampleWord.ClonedVerb();
+			    	futureShort.AddFutureShort();
+			    	futureShort.AddDa();
+			    	
+			    	// Future long
+			    	var futureLong:Verb = exampleWord.ClonedVerb();
+			    	futureLong.AddFutureLong();
+			    	futureLong.AddDa();
+			    	
+			    	// Favor Low
+			    	var favorLow:Verb = exampleWord.ClonedVerb();
+			    	favorLow.AddFavorLow();
+			    	favorLow.AddDa();
+			    	
+			    	// Favor High
+			    	var favorHigh:Verb = exampleWord.ClonedVerb();
+			    	favorHigh.AddFavorHigh();
+			    	favorHigh.AddDa();
+			    	
+			    	// Please Polite
+			    	var pleasePolite:Verb = exampleWord.ClonedVerb();
+			    	pleasePolite.AddPleasePoliteEnding();
+			    	
+			    	// Please Formal
+			    	var pleaseFormal:Verb = exampleWord.ClonedVerb();
+			    	pleaseFormal.AddPleaseFormalEnding();
+			    	
+			    	// Let's Polite
+			    	var letsPolite:Verb = exampleWord.ClonedVerb();
+			    	letsPolite.AddLetsPoliteEnding();
+			    	
+			    	// Let's Formal
+			    	var letsFormal:Verb = exampleWord.ClonedVerb();
+			    	letsFormal.AddLetsFormalEnding();
+
+			    	// Right Low
+			    	var rightIntimate:Verb = exampleWord.ClonedVerb();
+			    	rightIntimate.AddRightIntimateEnding();
+			    	
+			    	// Right Polite
+			    	var rightPolite:Verb = exampleWord.ClonedVerb();
+			    	rightPolite.AddRightPoliteEnding();
+			    	
+			    	// FYI Intimate
+			    	var fyiIntimate:Verb = exampleWord.ClonedVerb();
+			    	fyiIntimate.AddFyiIntimateEnding();
+			    	
+			    	// FYI Polite
+			    	var fyiPolite:Verb = exampleWord.ClonedVerb();
+			    	fyiPolite.AddFyiPoliteEnding();
+			    	
+			    	// Try
+			    	var tryVerb:Verb = exampleWord.ClonedVerb();
+			    	tryVerb.addTry();
+			    	tryVerb.AddDa();
+			    	
+			    	// Since
+			    	var since:Verb = exampleWord.ClonedVerb();
+			    	since.addSince();
+			    	
+			    	// If
+			    	var ifVerb:Verb = exampleWord.ClonedVerb();
+			    	ifVerb.addIf();
+			    	
+			    	// And
+			    	var and:Verb = exampleWord.ClonedVerb();
+			    	and.AddAnd();
+			    	
+			    	// In Order To (long)
+			    	var inOrderToLong:Verb = exampleWord.ClonedVerb();
+			    	inOrderToLong.AddInOrderToLong();
+		
+					// In Order To (short)
+			    	var inOrderToShort:Verb = exampleWord.ClonedVerb();
+			    	inOrderToShort.AddInOrderToShort();
+					
+					// Have To
+			    	var haveTo:Verb = exampleWord.ClonedVerb();
+			    	haveTo.AddHaveTo();
+			    	haveTo.AddDa();
+					
+					// Don't (choice)
+			    	var dontChoice:Verb = exampleWord.ClonedVerb();
+			    	dontChoice.AddDontAfter();
+			    	dontChoice.AddDa();
+					
+					// Don't (command)
+			    	var dontCommand:Verb = exampleWord.ClonedVerb();
+			    	dontCommand.AddDontCommand();
+			    	dontCommand.AddDa();
+					
+					// Can't (unable)
+			    	var cantUnable:Verb = exampleWord.ClonedVerb();
+			    	cantUnable.AddCantUnableAfter();
+			    	cantUnable.AddDa();
+					
+					// Can't (no way)
+			    	var cantPhysically:Verb = exampleWord.ClonedVerb();
+			    	cantPhysically.AddCantPhysically();
+			    	cantPhysically.AddDa();
+					
+					// Can
+			    	var can:Verb = exampleWord.ClonedVerb();
+			    	can.AddCan();
+			    	can.AddDa();
+					
+					// Present Progressive
+			    	var progressivePresent:Verb = exampleWord.ClonedVerb();
+			    	progressivePresent.AddProgressivePresent();
+			    	progressivePresent.AddDa();
+					
+					// Progressive State
+			    	var progressiveState:Verb = exampleWord.ClonedVerb();
+			    	progressiveState.AddProgressiveState();
+			    	progressiveState.AddDa();
+					
+					// Want (intimate)
+			    	var wantIntimate:Verb = exampleWord.ClonedVerb();
+			    	wantIntimate.AddWantIntimate();
+					
+					// Want (polite)
+			    	var wantPolite:Verb = exampleWord.ClonedVerb();
+			    	wantPolite.AddWantPolite();
+					
+					// Want
+			    	var want:Verb = exampleWord.ClonedVerb();
+			    	want.AddWant();
+			    	want.AddDa();
+
+					// Intent
+			    	var intent:Verb = exampleWord.ClonedVerb();
+			    	intent.AddIntent();
+			    	intent.AddDa();
+					
+					// But
+			    	var but:Verb = exampleWord.ClonedVerb();
+			    	but.AddBut();
+					
+					// Even Though
+			    	var evenThough:Verb = exampleWord.ClonedVerb();
+			    	evenThough.AddEvenThough();
+					
+					// Or
+			    	var or:Verb = exampleWord.ClonedVerb();
+			    	or.AddOr();
+					
+					// While
+			    	var whileVerb:Verb = exampleWord.ClonedVerb();
+			    	whileVerb.AddWhile();
+					
+					// When
+			    	var when:Verb = exampleWord.ClonedVerb();
+			    	when.AddWhen();
+			    	
+			    	examplesArray = new Array(
+			    		{name:"Verb Base", result:base.ToClickableString(), pronunciation:base.DetectSoundChanges()},
+				    	{name:"Intimate", result:intimate.ToClickableString(), pronunciation:intimate.DetectSoundChanges()},
+				    	{name:"Polite", result:polite.ToClickableString(), pronunciation:polite.DetectSoundChanges()},
+				    	{name:"Formal (.)", result:formalStatement.ToClickableString(), pronunciation:formalStatement.DetectSoundChanges()},
+				    	{name:"Formal (?)", result:formalQuestion.ToClickableString(), pronunciation:formalQuestion.DetectSoundChanges()},
+				    	{name:"Honorific", result:honorific.ToClickableString(), pronunciation:honorific.DetectSoundChanges()},
+				    	{name:"Past Tense", result:past.ToClickableString(), pronunciation:past.DetectSoundChanges()},
+				    	{name:"Past Perfect", result:pastPerfect.ToClickableString(), pronunciation:pastPerfect.DetectSoundChanges()},
+				    	{name:"Future (short)", result:futureShort.ToClickableString(), pronunciation:futureShort.DetectSoundChanges()},
+				    	{name:"Future (long)", result:futureLong.ToClickableString(), pronunciation:futureLong.DetectSoundChanges()},
+				    	{name:"Favor (low)", result:favorLow.ToClickableString(), pronunciation:favorLow.DetectSoundChanges()},
+				    	{name:"Favor (high)", result:favorHigh.ToClickableString(), pronunciation:favorHigh.DetectSoundChanges()},
+				    	{name:"Please (polite)", result:pleasePolite.ToClickableString(), pronunciation:pleasePolite.DetectSoundChanges()},
+				    	{name:"Please (formal)", result:pleaseFormal.ToClickableString(), pronunciation:pleaseFormal.DetectSoundChanges()},
+				    	{name:"Let's (polite)", result:letsPolite.ToClickableString(), pronunciation:letsPolite.DetectSoundChanges()},
+				    	{name:"Let's (formal)", result:letsFormal.ToClickableString(), pronunciation:letsFormal.DetectSoundChanges()},
+				    	{name:"Right? (low)", result:rightIntimate.ToClickableString(), pronunciation:rightIntimate.DetectSoundChanges()},
+				    	{name:"Right? (polite)", result:rightPolite.ToClickableString(), pronunciation:rightPolite.DetectSoundChanges()},
+				    	{name:"FYI (intimate)", result:fyiIntimate.ToClickableString(), pronunciation:fyiIntimate.DetectSoundChanges()},
+				    	{name:"FYI (polite)", result:fyiPolite.ToClickableString(), pronunciation:fyiPolite.DetectSoundChanges()},
+				    	{name:"Try", result:tryVerb.ToClickableString(), pronunciation:tryVerb.DetectSoundChanges()},
+				    	{name:"Since", result:since.ToClickableString(), pronunciation:since.DetectSoundChanges()},
+				    	{name:"If", result:ifVerb.ToClickableString(), pronunciation:ifVerb.DetectSoundChanges()},
+				    	{name:"And", result:and.ToClickableString(), pronunciation:and.DetectSoundChanges()},
+				    	{name:"In Order To (long)", result:inOrderToLong.ToClickableString(), pronunciation:inOrderToLong.DetectSoundChanges()},
+				    	{name:"In Order To (short)", result:inOrderToShort.ToClickableString(), pronunciation:inOrderToShort.DetectSoundChanges()},
+				    	{name:"Have To", result:haveTo.ToClickableString(), pronunciation:haveTo.DetectSoundChanges()},
+				    	{name:"Don't (choice)", result:dontChoice.ToClickableString(), pronunciation:dontChoice.DetectSoundChanges()},
+				    	{name:"Don't (command)", result:dontCommand.ToClickableString(), pronunciation:dontCommand.DetectSoundChanges()},
+				    	{name:"Can't (unable)", result:cantUnable.ToClickableString(), pronunciation:cantUnable.DetectSoundChanges()},
+				    	{name:"Can't (no way)", result:cantPhysically.ToClickableString(), pronunciation:cantPhysically.DetectSoundChanges()},
+				    	{name:"Can", result:can.ToClickableString(), pronunciation:can.DetectSoundChanges()},
+				    	{name:"Present Progressive", result:progressivePresent.ToClickableString(), pronunciation:progressivePresent.DetectSoundChanges()},
+				    	{name:"Progressive State", result:progressiveState.ToClickableString(), pronunciation:progressiveState.DetectSoundChanges()},
+				    	{name:"Want (intimate)", result:wantIntimate.ToClickableString(), pronunciation:wantIntimate.DetectSoundChanges()},
+				    	{name:"Want (polite)", result:wantPolite.ToClickableString(), pronunciation:wantPolite.DetectSoundChanges()},
+				    	{name:"Want", result:want.ToClickableString(), pronunciation:want.DetectSoundChanges()},
+				    	{name:"Intent", result:intent.ToClickableString(), pronunciation:intent.DetectSoundChanges()},
+				    	{name:"But", result:but.ToClickableString(), pronunciation:but.DetectSoundChanges()},
+				    	{name:"Even Though", result:evenThough.ToClickableString(), pronunciation:evenThough.DetectSoundChanges()},
+				    	{name:"Or", result:or.ToClickableString(), pronunciation:or.DetectSoundChanges()},
+				    	{name:"While", result:whileVerb.ToClickableString(), pronunciation:whileVerb.DetectSoundChanges()},
+				    	{name:"When", result:when.ToClickableString(), pronunciation:when.DetectSoundChanges()});
+
+		    	} else if(exampleWord.IsSentence) {
+		    		examplesArray = new Array(
+			    		{name:"Sentence", result:exampleWord.ToClickableString(), pronunciation:exampleWord.DetectSoundChanges()});
+		    	} else{
+		    		examplesArray = new Array(
+			    		{name:"Word", result:exampleWord.ToClickableString(), pronunciation:exampleWord.DetectSoundChanges()});
+		    	}
+			    
+			    resultDataGrid.dataProvider = examplesArray; 
+		    }
+    		
+    		 private function openPhoneWindow():void {
+    		 	if(phoneWindow == null) {
+            		if(keyboardWindow != null) {
+            			PopUpManager.removePopUp(keyboardWindow);
+                		keyboardWindow = null;
+            		}
+	                phoneWindow = new PhoneInputWindow();
+            		phoneWindow.mainForm = this;
+	                phoneWindow.addEventListener(CloseEvent.CLOSE, phoneWindow_close);
+	
+	                PopUpManager.addPopUp(phoneWindow, this, false);
+       			}
+       			PopUpManager.centerPopUp(phoneWindow);
+            }
+            
+            private function openKeyboardWindow():void {
+            	if(keyboardWindow == null) {
+            		if(phoneWindow != null) {
+            			PopUpManager.removePopUp(phoneWindow);
+                		phoneWindow = null;
+            		}
+            		keyboardWindow = new KeyboardInputWindow();
+            		keyboardWindow.mainForm = this;
+	                keyboardWindow.addEventListener(CloseEvent.CLOSE, keyboardWindow_close);
+	
+	                PopUpManager.addPopUp(keyboardWindow, this, false);
+            	}
+            	PopUpManager.centerPopUp(keyboardWindow);
+            }
+            
+            private function openAboutWindow():void {
+            	if(aboutWindow == null) {
+            		aboutWindow = new AboutWindow();
+	                aboutWindow.addEventListener(CloseEvent.CLOSE, aboutWindow_close);
+	
+	                PopUpManager.addPopUp(aboutWindow, this, false);
+	                PopUpManager.centerPopUp(aboutWindow);
+            	}
+            }
+            
+            private function openHelpWindow():void {
+            	if(helpWindow == null) {
+            		helpWindow = new HelpWindow();
+	                helpWindow.addEventListener(CloseEvent.CLOSE, helpWindow_close);
+	
+	                PopUpManager.addPopUp(helpWindow, this, false);
+	                PopUpManager.centerPopUp(helpWindow);
+            	}
+            }
+    		
+    		private function phoneWindow_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(phoneWindow);
+                phoneWindow = null;
+            }
+
+			private function keyboardWindow_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(keyboardWindow);
+                keyboardWindow = null;
+            }
+            
+            private function aboutWindow_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(aboutWindow);
+                aboutWindow = null;
+            }
+            
+            private function helpWindow_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(helpWindow);
+                helpWindow = null;
+            }
+            
+            private function clearInputCharacter():void {
+                currentChar = new Character;
+            }
+            
+            public function execute():void {
+            	createAllExamples(inputText.text);
+            }
+            
+            public function copy():void {
+            	System.setClipboard(inputText.text);
+            }
+            
+            public function moveCursorRight():void {
+            	inputText.setSelection(inputText.selectionEndIndex+1,inputText.selectionEndIndex+1);
+            }
+            
+            public function moveCursorLeft():void {
+            	inputText.setSelection(inputText.selectionBeginIndex-1,inputText.selectionBeginIndex-1);
+            }
+            
+            public function deleteFordward():void {
+            	var newSelectionIdx:int = 0;
+            	if(inputText.selectionBeginIndex == inputText.selectionEndIndex) {
+            		if(inputText.selectionBeginIndex == 0)
+            			return;
+            		else {
+            			newSelectionIdx = inputText.selectionBeginIndex-1;
+            			inputText.text = inputText.text.substring(0, newSelectionIdx) + inputText.text.substring(inputText.selectionEndIndex, inputText.length);
+            			inputText.setSelection(newSelectionIdx,newSelectionIdx);
+            			clearInputCharacter();
+            		}
+            	} else if(inputText.selectionEndIndex - inputText.selectionBeginIndex > 1) {
+            		removeSelected();
+            		clearInputCharacter();
+            	} else {
+            		currentChar.removeJamo();
+            		if(currentChar.IsEmpty()) {
+            			removeSelected();
+            			clearInputCharacter();
+            		} else {
+            			newSelectionIdx = inputText.selectionBeginIndex;
+	        			inputText.text = inputText.text.substring(0, newSelectionIdx) + currentChar.ToString() + inputText.text.substring(inputText.selectionEndIndex, inputText.length);
+	        			inputText.setSelection(newSelectionIdx,newSelectionIdx+1);
+            		}
+            	}
+            }
+            
+            public function deleteBack():void {
+            	var newSelectionIdx:int = 0;
+            	if(inputText.selectionBeginIndex == inputText.selectionEndIndex) {
+            		if(inputText.selectionEndIndex == inputText.text.length-1)
+            			return;
+            		else {
+            			newSelectionIdx = inputText.selectionBeginIndex;
+            			inputText.text = inputText.text.substring(0, newSelectionIdx+1) + inputText.text.substring(inputText.selectionEndIndex+1, inputText.length);
+            			inputText.setSelection(newSelectionIdx,newSelectionIdx);
+            			clearInputCharacter();
+            		}
+            	} else if(inputText.selectionEndIndex - inputText.selectionBeginIndex > 1) {
+            		removeSelected();
+            		clearInputCharacter();
+            	} else {
+            		if(currentChar.IsEmpty()) {
+            			removeSelected();
+            			clearInputCharacter();
+            		} else {
+            			newSelectionIdx = inputText.selectionBeginIndex;
+	        			inputText.text = inputText.text.substring(0, newSelectionIdx) + currentChar.ToString() + inputText.text.substring(inputText.selectionEndIndex, inputText.length);
+	        			inputText.setSelection(newSelectionIdx,newSelectionIdx);
+            		}
+            	}
+            }
+            
+            private function removeSelected():int {
+            	if(inputText.text.length == 0) {
+            		inputText.setSelection(0,0);
+            		return 0;
+            	}
+            		
+            	if(inputText.selectionEndIndex == inputText.selectionBeginIndex) {
+            		return inputText.selectionBeginIndex;
+            	} else {
+            		var newSelectionIdx:int = inputText.selectionBeginIndex;
+        			inputText.text = inputText.text.substring(0, newSelectionIdx) + inputText.text.substring(inputText.selectionEndIndex, inputText.length);
+        			inputText.setSelection(newSelectionIdx,newSelectionIdx);        		
+            		return newSelectionIdx;
+            	}
+            }
+            
+            public function addSpecial(char:String):void {
+            	var selectionIdx:int = removeSelected();
+        		var charString:String = "";
+        		if(!currentChar.IsEmpty())
+        			charString = currentChar.ToString();
+        		inputText.text = inputText.text.substring(0, selectionIdx) + charString + char + inputText.text.substring(selectionIdx, inputText.length);
+        		inputText.setSelection(selectionIdx+1+charString.length,selectionIdx+1+charString.length);
+        		currentChar = new Character;
+            }
+            
+            // Adds like you would
+            public function addCellLetter(letter:String, replace:Boolean):void {
+            	
+            }
+            
+            public function finishBlock():void {
+            	var selectionIdx:int = removeSelected();
+            	inputText.text = inputText.text.substring(0, selectionIdx) + currentChar.ToString() + inputText.text.substring(selectionIdx, inputText.length);
+            	inputText.setSelection(selectionIdx+1,selectionIdx+1);
+            }
+            
+            // Adds a jamo to the selection and/or starts a new character
+            public function addJamo(jamo:String):void {
+            	var selectionIdx:int = removeSelected();
+            	if(jamo == " ") {
+            		var charString:String = "";
+            		if(!currentChar.IsEmpty())
+            			charString = currentChar.ToString();
+	        		inputText.text = inputText.text.substring(0, selectionIdx) + charString + " " + inputText.text.substring(selectionIdx, inputText.length);
+	        		inputText.setSelection(selectionIdx+1+charString.length,selectionIdx+1+charString.length);
+	        		currentChar = new Character;
+            		return;
+            	}
+            	
+            	var newChar:Character = currentChar.addJamo(jamo);
+            	if(newChar == null) {
+            		inputText.text = inputText.text.substring(0, selectionIdx) + currentChar.ToString() + inputText.text.substring(selectionIdx, inputText.length);
+            		inputText.setSelection(selectionIdx,selectionIdx+1);
+            	} else {
+            		inputText.text = inputText.text.substring(0, selectionIdx) + currentChar.ToString() + newChar.ToString() + inputText.text.substring(selectionIdx, inputText.length);
+            		inputText.setSelection(selectionIdx+1,selectionIdx+2);
+            		currentChar = newChar;
+            	}
+            }
+
+            private function searchWebsite():void
+            {
+            	var searchString:String;
+            	if(inputText.selectionBeginIndex == inputText.selectionEndIndex)
+            		searchString = inputText.text;
+            	else
+            		searchString = inputText.text.substring(inputText.selectionBeginIndex, inputText.selectionEndIndex);
+            	navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?search='+encodeURI(searchString)+'&fulltext=Search'), '_blank');
+            }
+            
+            private function toggleMode():void
+            {
+            	contractResults.visible = !contractResults.visible;
+            	contractResults.includeInLayout = !contractResults.includeInLayout;
+            	go.visible = !go.visible;
+            	go.includeInLayout = !go.includeInLayout;
+            	//search.visible = !search.visible;
+            	//search.includeInLayout = !search.includeInLayout;
+            	resultDataGrid.visible = !resultDataGrid.visible;
+            	resultDataGrid.includeInLayout = !resultDataGrid.includeInLayout;
+            	
+            	inputText.wordWrap = !inputText.wordWrap;
+            	if(inputText.height == 24) {
+            		mainPanel.addChild(inputText);
+            		inputText.percentHeight = 100;
+            	}
+            	else {
+            		toolbar.addChildAt(inputText,4);
+            		inputText.height = 24;
+            	}
+            }
+		]]>
+	</mx:Script>
+
+	<mx:ApplicationControlBar width="100%" alpha="1.0" fillAlphas="[0.8, 0.62]" horizontalGap="2" paddingTop="2" paddingRight="2" paddingLeft="2" paddingBottom="2">
+		<mx:LinkButton label="Korean Wiki Project" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Main_Page'), '_blank');" toolTip="Visit the main project page"/>
+		<mx:Label text="|" textAlign="center" width="12"/>
+		<mx:LinkButton label="Hangeul" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Learn_hangeul'), '_blank');" toolTip="Learn Hangeul from the beginning"/>
+		<mx:LinkButton label="Grammar" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Category:Grammar_Pattern'), '_blank');" toolTip="View Korean grammar forms"/>
+		<mx:LinkButton label="Vocabulary" click="navigateToURL(new URLRequest('http://www.koreanwikiproject.com/wiki/index.php?title=Category:Vocabulary'), '_blank');" toolTip="Go to Korean vocabulary pages"/>
+		<mx:Spacer width="100%" minWidth="0"/>
+		<com:ImageButton source="@Embed('../images/help.png')" click="openHelpWindow()"  toolTip="View more about Hangeul Assistant" id="helpButton"/>
+		<com:ImageButton source="@Embed('../images/information.png')" click="openAboutWindow()"  toolTip="View more about Hangeul Assistant" id="infoButton"/>
+	</mx:ApplicationControlBar>
+	<mx:Panel width="100%" layout="vertical" title="Hangeul Assistant" paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5" height="100%"
+		borderColor="#FFFFFF" backgroundColor="#FEDA4A" borderThicknessBottom="5" borderThicknessLeft="5" borderThicknessRight="5" borderThicknessTop="0" headerHeight="25" verticalGap="2" id="mainPanel">
+		<mx:keyDown>if(event.keyCode == Keyboard.F2) openKeyboardWindow();</mx:keyDown>
+		<mx:HBox width="100%" verticalAlign="middle" horizontalGap="2" id="toolbar" height="24">
+			<com:ImageButton source="@Embed('../images/phone.png')" click="openPhoneWindow()" toolTip="Virtual Cellphone" id="phoneButton"/>
+			<com:ImageButton source="@Embed('../images/keyboard.png')" click="openKeyboardWindow()"  toolTip="Virtual Keyboard (F2)" id="keyboardButton"/>
+			<com:ImageButton source="@Embed('../images/copy.png')" click="copy()"  toolTip="Copy all or selected text" id="copyButton"/>
+			<com:ImageButton source="@Embed('../images/edit.png')" click="toggleMode()"  toolTip="Toggle between essay/short mode" id="editButton"/>
+			<com:PromptingTextArea id="inputText" width="100%" fontSize="12" prompt="Type a verb, word or sentence (Eg. 하다, 원리, or 제가 갔습니다)"
+				keyDown="if(event.ctrlKey || event.altKey) return; if(event.keyCode == Keyboard.F2) openKeyboardWindow(); if(keyboardWindow != null) keyboardWindow.dispatchEvent(new KeyboardEvent(event.type,event.bubbles,event.cancelable,event.charCode,event.keyCode,event.keyLocation)); else if(phoneWindow != null) phoneWindow.dispatchEvent(new KeyboardEvent(event.type,event.bubbles,event.cancelable,event.charCode,event.keyCode,event.keyLocation)); else {clearInputCharacter(); if(event.charCode == 13) {if(inputText.height==24) {execute();}} }"
+				textInput="if(event.text.indexOf('\n') != -1) if(inputText.height == 24) event.preventDefault();"
+				mouseDown="clearInputCharacter()" wordWrap="false" editable="true" enabled="true" height="24">
+				</com:PromptingTextArea>
+			<mx:CheckBox label="Contract" selected="true" id="contractResults">
+				<mx:toolTip>If selected, verbs will be shown in their contracted forms</mx:toolTip>
+			</mx:CheckBox>
+			<mx:Button label="Go!" id="go" click="createAllExamples(inputText.text);" height="100%" toolTip="Click to show more information" paddingBottom="2" paddingLeft="2" paddingTop="2" paddingRight="2"/>
+			<com:ImageButton source="@Embed('../images/search.png')" click="searchWebsite()"  toolTip="Search for all or selected text on the Korean Wiki Project" id="search"/>
+		</mx:HBox>
+		<mx:DataGrid width="100%" height="100%" id="resultDataGrid" fontSize="11">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Type" dataField="name" id="nameColumn"/>
+				<mx:DataGridColumn headerText="Result" dataField="result" id="resultColumn"/>
+				<mx:DataGridColumn headerText="Pronunciation" dataField="pronunciation" id="pronunciationColumn"/>
+			</mx:columns>
+		</mx:DataGrid>
+	</mx:Panel>
+	
+</mx:Application>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com:CanvasButton xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:com="com.*" height="100%" width="10%" fontSize="12">
+	<mx:Script>
+		<![CDATA[
+			import com.Verb;
+			import com.ImageMap;
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+       		import mx.controls.Alert;
+       		import mx.effects.easing.Bounce;
+       		import mx.core.BitmapAsset;
+       		import mx.managers.PopUpManager;
+       		import mx.events.CloseEvent;
+       		
+       		public var smallLetter:String = '';
+       		public var capitalLetter:String = '';
+       		public var parentKeyboard:KeyboardInputWindow;
+       		
+       		[Bindable]
+       		public var cornerText:String = "";
+       		
+       		public function toggleShift():void {
+       			if(parentKeyboard.shiftEnabled) {
+       				this.label = capitalLetter;
+       			} else {
+       				this.label = smallLetter;
+       			}
+       		}
+       		
+       		public function currentValue():String {
+       			if(parentKeyboard.shiftEnabled) {
+       				return capitalLetter;
+       			} else {
+       				return smallLetter;
+       			}
+       		}
+		]]>
+	</mx:Script>
+	<mx:Label id="cornerLabel" text="{cornerText}" textAlign="left" fontSize="8" />
+</com:CanvasButton>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" showCloseButton="true" title="How to use Hangeul Assistant" horizontalAlign="center" verticalGap="2" borderAlpha=".9" borderColor="#A6CCF4" xmlns:ns1="com.*" horizontalGap="2">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+       		import flash.net.URLRequest;
+		]]>
+	</mx:Script>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="2" horizontalGap="2">
+		<mx:Label text="Type in Korean:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Click on the" fontSize="12"/>
+		<mx:Image source="@Embed('../images/keyboard.png')"/>
+		<mx:Label text="button," fontSize="12"/>
+	</mx:HBox>
+	<mx:Text text="then type on your keyboard or click on the buttons" fontSize="12"/>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="2" horizontalGap="2">
+		<mx:Label text="Type on a cellphone:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Click on the" fontSize="12"/>
+		<mx:Image source="@Embed('../images/phone.png')"/>
+		<mx:Label text="button" fontSize="12"/>
+	</mx:HBox>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="2" horizontalGap="2">
+		<mx:Label text="Copy text:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Click on the" fontSize="12"/>
+		<mx:Image source="@Embed('../images/copy.png')"/>
+		<mx:Label text="button" fontSize="12"/>
+	</mx:HBox>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="2" horizontalGap="2">
+		<mx:Label text="Switch to/from Essay Mode:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Click on the" fontSize="12"/>
+		<mx:Image source="@Embed('../images/edit.png')"/>
+		<mx:Label text="button" fontSize="12"/>
+	</mx:HBox>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle">
+		<mx:Label text="Conjugate verbs:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Type a verb and hit enter or click go" fontSize="12"/>
+	</mx:HBox>
+	<mx:Text text="NOTE: All verb forms are used, even if it doesn't make sense" fontSize="12"/>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle">
+		<mx:Label text="See pronunciation:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Type anything and hit enter or click go" fontSize="12"/>
+	</mx:HBox>
+	<mx:HRule width="100%"/>
+	<mx:HBox width="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="2" horizontalGap="2">
+		<mx:Label text="Search for a term:" fontSize="12" fontWeight="bold"/>
+		<mx:Text text="Type anything and click on the" fontSize="12"/>
+		<mx:Image source="@Embed('../images/search.png')"/>
+		<mx:Label text="button" fontSize="12"/>
+	</mx:HBox>
+</mx:TitleWindow>
